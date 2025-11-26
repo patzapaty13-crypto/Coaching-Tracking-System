@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { User } from '../types';
 import { validateEmail } from '../utils/security';
 import { login, storeUser } from '../services/authService';
-import { Lock, Mail, Eye, EyeOff, AlertCircle, ChevronLeft, Loader2, Phone, UserPlus } from 'lucide-react';
+import { Lock, Mail, Eye, EyeOff, AlertCircle, ChevronLeft, Phone, UserPlus } from 'lucide-react';
 
 interface SecureLoginPageProps {
   onLogin: (user: User) => void;
