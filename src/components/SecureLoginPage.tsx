@@ -81,27 +81,27 @@ export function SecureLoginPage({ onLogin }: SecureLoginPageProps) {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-sm">
         {/* Profile Icon */}
-        <div className="flex justify-center mb-6">
-          <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center shadow-lg">
-            <UserIcon className="w-10 h-10 text-white" strokeWidth={2} />
+        <div className="flex justify-center mb-4">
+          <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center shadow-md">
+            <UserIcon className="w-8 h-8 text-white" strokeWidth={2} />
           </div>
         </div>
 
         {/* Title */}
-        <h1 className="text-3xl font-bold text-gray-900 text-center mb-8">Sign In</h1>
+        <h1 className="text-2xl font-bold text-gray-900 text-center mb-6">Sign In</h1>
 
         {/* Error Message */}
         {errors.general && (
-          <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg flex items-start gap-3 text-red-700 text-sm">
-            <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+          <div className="mb-4 p-3 bg-red-50 border-l-4 border-red-500 rounded-lg flex items-start gap-2 text-red-700 text-sm">
+            <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
             <span className="flex-1">{errors.general}</span>
           </div>
         )}
 
         {/* Login Form */}
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {/* Username Field */}
           <div>
             <input
@@ -110,7 +110,7 @@ export function SecureLoginPage({ onLogin }: SecureLoginPageProps) {
               value={username}
               onChange={handleUsernameChange}
               disabled={isLoading}
-              className={`w-full px-4 py-3.5 rounded-xl border-2 transition-all duration-200 placeholder-gray-400 bg-white ${
+              className={`w-full px-4 py-3 rounded-lg border-2 transition-all duration-200 placeholder-gray-400 bg-white text-gray-900 ${
                 errors.username 
                   ? 'border-red-500 bg-red-50 focus:border-red-500 focus:ring-2 focus:ring-red-200' 
                   : 'border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200'
@@ -120,8 +120,8 @@ export function SecureLoginPage({ onLogin }: SecureLoginPageProps) {
               required
             />
             {errors.username && (
-              <p className="mt-2 text-sm text-red-600 flex items-center gap-1.5">
-                <AlertCircle className="w-4 h-4" />
+              <p className="mt-1.5 text-xs text-red-600 flex items-center gap-1">
+                <AlertCircle className="w-3 h-3" />
                 {errors.username}
               </p>
             )}
@@ -136,7 +136,7 @@ export function SecureLoginPage({ onLogin }: SecureLoginPageProps) {
                 value={password}
                 onChange={handlePasswordChange}
                 disabled={isLoading}
-                className={`w-full px-4 py-3.5 rounded-xl border-2 transition-all duration-200 placeholder-gray-400 bg-white ${
+                className={`w-full px-4 py-3 pr-12 rounded-lg border-2 transition-all duration-200 placeholder-gray-400 bg-white text-gray-900 ${
                   errors.password 
                     ? 'border-red-500 bg-red-50 focus:border-red-500 focus:ring-2 focus:ring-red-200' 
                     : 'border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200'
@@ -149,7 +149,7 @@ export function SecureLoginPage({ onLogin }: SecureLoginPageProps) {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 disabled={isLoading}
-                className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 hover:text-gray-600 transition-colors duration-200 focus:outline-none disabled:opacity-50"
+                className="absolute inset-y-0 right-0 flex items-center pr-3 text-blue-600 hover:text-blue-700 transition-colors duration-200 focus:outline-none disabled:opacity-50"
                 tabIndex={-1}
               >
                 {showPassword ? (
@@ -160,8 +160,8 @@ export function SecureLoginPage({ onLogin }: SecureLoginPageProps) {
               </button>
             </div>
             {errors.password && (
-              <p className="mt-2 text-sm text-red-600 flex items-center gap-1.5">
-                <AlertCircle className="w-4 h-4" />
+              <p className="mt-1.5 text-xs text-red-600 flex items-center gap-1">
+                <AlertCircle className="w-3 h-3" />
                 {errors.password}
               </p>
             )}
@@ -171,11 +171,11 @@ export function SecureLoginPage({ onLogin }: SecureLoginPageProps) {
           <button
             type="submit"
             disabled={isLoading || !username || !password}
-            className="w-full bg-blue-600 text-white py-3.5 rounded-xl font-semibold hover:bg-blue-700 active:scale-[0.98] transition-all duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed shadow-md hover:shadow-lg disabled:shadow-none"
+            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 active:scale-[0.98] transition-all duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed shadow-sm hover:shadow-md disabled:shadow-none"
           >
             {isLoading ? (
               <span className="flex items-center justify-center gap-2">
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 กำลังเข้าสู่ระบบ...
               </span>
             ) : (
@@ -185,7 +185,7 @@ export function SecureLoginPage({ onLogin }: SecureLoginPageProps) {
         </form>
 
         {/* Remember Me & Forgot Password */}
-        <div className="mt-6 flex items-center justify-between">
+        <div className="mt-4 flex items-center justify-between">
           {/* Remember Me */}
           <label className="flex items-center gap-2 cursor-pointer group">
             <div className="relative">
@@ -195,13 +195,13 @@ export function SecureLoginPage({ onLogin }: SecureLoginPageProps) {
                 onChange={(e) => setRememberMe(e.target.checked)}
                 className="sr-only"
               />
-              <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+              <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all ${
                 rememberMe 
                   ? 'bg-blue-600 border-blue-600' 
                   : 'bg-white border-gray-300 group-hover:border-blue-500'
               }`}>
                 {rememberMe && (
-                  <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
+                  <Check className="w-3 h-3 text-white" strokeWidth={3} />
                 )}
               </div>
             </div>
@@ -211,7 +211,7 @@ export function SecureLoginPage({ onLogin }: SecureLoginPageProps) {
           {/* Forgot Password */}
           <button
             type="button"
-            className="text-sm text-blue-600 font-medium hover:text-blue-700 transition-colors"
+            className="text-sm text-gray-600 font-medium hover:text-blue-600 transition-colors"
           >
             Forgot Password
           </button>
