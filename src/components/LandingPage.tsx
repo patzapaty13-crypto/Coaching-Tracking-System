@@ -1,4 +1,5 @@
-import { CheckCircle, TrendingUp, Bot, Layout, BarChart3, Workflow, FileText, ArrowRight, Sparkles } from 'lucide-react';
+import { CheckCircle, TrendingUp, Bot, Layout, BarChart3, Workflow, FileText, ArrowRight, Sparkles, Phone, Mail, ExternalLink, HelpCircle } from 'lucide-react';
+import { Facebook, Youtube, Instagram, Linkedin, MessageCircle } from 'lucide-react';
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -54,128 +55,170 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 relative overflow-hidden">
+      {/* Background Image Overlay */}
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyMCIgaGVpZ2h0PSIxMDgwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZ3JhZCIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDI3NTc7c3RvcC1vcGFjaXR5OjAuOSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6IzAwMGE0YTtzdG9wLW9wYWNpdHk6MC44Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjE5MjAiIGhlaWdodD0iMTA4MCIgZmlsbD0idXJsKCNncmFkKSIvPjwvc3ZnPg==')] bg-cover bg-center opacity-30"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-900/90 via-blue-800/80 to-transparent"></div>
+      
       {/* Decorative Blur Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
       </div>
 
-      <div className="relative z-10">
-        {/* Hero Section */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
-          <div className="text-center">
-            {/* Logo/Icon */}
-            <div className="relative inline-block mb-6">
-              <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-purple-600 rounded-3xl flex items-center justify-center mx-auto shadow-2xl transform hover:scale-105 transition-transform duration-300">
-                <TrendingUp className="w-12 h-12 text-white" />
+      <div className="relative z-10 min-h-screen flex flex-col">
+        {/* Top Contact Bar */}
+        <div className="bg-black/20 backdrop-blur-sm border-b border-white/10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+            <div className="flex items-center justify-between text-sm text-white/90">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <Phone className="w-4 h-4" />
+                  <span>โทร: (02) 579-1111</span>
+                </div>
+                <span>|</span>
+                <div className="flex items-center gap-2">
+                  <Mail className="w-4 h-4" />
+                  <span>อีเมล: coaching@spu.ac.th</span>
+                </div>
               </div>
-              <div className="absolute -top-2 -right-2">
-                <Sparkles className="w-8 h-8 text-yellow-400 animate-pulse" />
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1 flex">
+          {/* Left Section - Branding & Content */}
+          <div className="flex-1 flex flex-col justify-center px-8 md:px-12 lg:px-16 py-12">
+            {/* University Branding */}
+            <div className="mb-8">
+              <div className="text-6xl md:text-7xl font-bold text-white mb-2 tracking-tight">
+                SPU
+              </div>
+              <div className="text-xl md:text-2xl text-white/90 font-light mb-8">
+                SRIPATUM UNIVERSITY
               </div>
             </div>
 
-            {/* Title */}
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4 tracking-tight">
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                SPU Coaching Platform
-              </span>
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-700 mb-2 font-semibold">
-              ระบบบริหารจัดการ Project-based Learning
-            </p>
-            <p className="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">
-              แพลตฟอร์มครบวงจรสำหรับการจัดการ Coaching Sessions, Portfolio และ Progress Tracking
-            </p>
-
-            {/* CTA Button */}
-            <button
-              onClick={onGetStarted}
-              className="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 overflow-hidden"
-            >
-              <span className="relative z-10 flex items-center gap-2">
-                เข้าสู่ระบบ
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </button>
-          </div>
-        </div>
-
-        {/* Features Section */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              คุณสมบัติหลัก
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              เครื่องมือที่ช่วยให้การจัดการ Project-based Learning เป็นเรื่องง่าย
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <div
-                  key={index}
-                  className="group bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-2xl border border-gray-200 hover:border-blue-300 transform hover:-translate-y-2 transition-all duration-300"
-                >
-                  <div className={`w-14 h-14 bg-gradient-to-br ${feature.gradient} rounded-xl flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                    <Icon className="w-7 h-7 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
-                    {feature.title}
-                  </h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    {feature.description}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Benefits Section */}
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 md:p-12 shadow-2xl border border-gray-200">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                ทำไมต้องใช้ SPU Coaching Platform?
-              </h2>
-              <p className="text-lg text-gray-600">
-                แก้ปัญหาที่คุณเจอในการจัดการ Project-based Learning
+            {/* Welcome Message */}
+            <div className="mb-6">
+              <p className="text-2xl md:text-3xl text-white/90 mb-4">ยินดีต้อนรับ</p>
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-3 leading-tight">
+                Coaching
+                <br />
+                <span className="text-pink-400">Platform</span>
+              </h1>
+              <p className="text-xl md:text-2xl text-white/80 font-light">
+                SPU Coaching & Project-based Learning Management System
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {benefits.map((benefit, index) => (
-                <div
-                  key={index}
-                  className="flex items-start gap-3 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200 hover:border-green-300 transition-all duration-200"
-                >
-                  <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
-                  <p className="text-gray-700 font-medium">{benefit}</p>
-                </div>
-              ))}
+            {/* CTA Buttons */}
+            <div className="flex flex-wrap gap-4 mt-8">
+              <button
+                onClick={onGetStarted}
+                className="group px-8 py-4 bg-pink-500 border-2 border-pink-400 text-white rounded-xl font-semibold hover:bg-pink-600 hover:border-pink-500 transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105"
+              >
+                <span>เรียนรู้เพิ่มเติม</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </button>
+              <button className="px-8 py-4 bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white rounded-xl font-semibold hover:bg-white/20 transition-all duration-300 flex items-center gap-2">
+                <Mail className="w-5 h-5" />
+                <span>ติดต่อเรา</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Right Section - Features Preview */}
+          <div className="hidden lg:flex flex-col justify-center px-8 py-12 max-w-md">
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+              <h3 className="text-white text-xl font-bold mb-4">คุณสมบัติหลัก</h3>
+              <div className="space-y-3">
+                {features.slice(0, 3).map((feature, index) => {
+                  const Icon = feature.icon;
+                  return (
+                    <div key={index} className="flex items-center gap-3 text-white/90">
+                      <div className={`w-10 h-10 bg-gradient-to-br ${feature.gradient} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                        <Icon className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-semibold">{feature.title}</p>
+                        <p className="text-sm text-white/70">{feature.description}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Final CTA */}
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
-          <div className="text-center">
-            <button
-              onClick={onGetStarted}
-              className="group relative inline-flex items-center justify-center px-10 py-5 text-xl font-bold text-white bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-2xl shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300 overflow-hidden"
-            >
-              <span className="relative z-10 flex items-center gap-3">
-                เริ่มใช้งานตอนนี้
-                <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-700 via-purple-700 to-pink-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </button>
+        {/* Social Media Icons - Right Side */}
+        <div className="absolute right-4 top-1/2 transform -translate-y-1/2 hidden lg:flex flex-col gap-3 z-20">
+          {[
+            { icon: Facebook, color: 'bg-blue-600', name: 'Facebook' },
+            { icon: Youtube, color: 'bg-red-600', name: 'YouTube' },
+            { icon: Instagram, color: 'bg-pink-600', name: 'Instagram' },
+            { icon: Linkedin, color: 'bg-blue-700', name: 'LinkedIn' },
+            { icon: MessageCircle, color: 'bg-green-500', name: 'LINE' },
+          ].map((social, index) => {
+            const Icon = social.icon;
+            return (
+              <a
+                key={index}
+                href="#"
+                className={`${social.color} w-12 h-12 rounded-full flex items-center justify-center text-white hover:scale-110 transition-transform duration-200 shadow-lg`}
+                title={social.name}
+              >
+                <Icon className="w-6 h-6" />
+              </a>
+            );
+          })}
+        </div>
+
+        {/* Footer */}
+        <div className="bg-black/30 backdrop-blur-sm border-t border-white/10 mt-auto">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-white/90">
+              {/* Left */}
+              <div>
+                <h4 className="font-bold text-lg mb-2">SPU COACHING PLATFORM</h4>
+                <p className="text-sm text-white/70">
+                  ระบบจัดการ Project-based Learning และ Coaching ที่ทันสมัยและมีประสิทธิภาพ
+                </p>
+              </div>
+
+              {/* Middle */}
+              <div>
+                <h4 className="font-bold text-lg mb-2">ติดต่อเรา</h4>
+                <p className="text-sm text-white/70 mb-1">มหาวิทยาลัยศรีปทุม</p>
+                <p className="text-sm text-white/70 mb-1">โทร: (02) 579-1111</p>
+                <p className="text-sm text-white/70">Email: coaching@spu.ac.th</p>
+              </div>
+
+              {/* Right */}
+              <div>
+                <h4 className="font-bold text-lg mb-2">ลิงก์ที่เกี่ยวข้อง</h4>
+                <div className="space-y-1 text-sm">
+                  <a href="#" className="text-white/70 hover:text-white flex items-center gap-1 transition-colors">
+                    เว็บไซต์หลักมหาวิทยาลัย
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                  <a href="#" className="text-white/70 hover:text-white flex items-center gap-1 transition-colors">
+                    ระบบอื่นๆ
+                  </a>
+                  <a href="#" className="text-white/70 hover:text-white flex items-center gap-1 transition-colors">
+                    <HelpCircle className="w-3 h-3" />
+                    ความช่วยเหลือ
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Copyright */}
+            <div className="mt-6 pt-6 border-t border-white/10 text-center text-sm text-white/60">
+              <p>© 2025 Sripatum University. All Rights Reserved.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -199,11 +242,7 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
         .animation-delay-2000 {
           animation-delay: 2s;
         }
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
       `}</style>
     </div>
   );
 }
-
