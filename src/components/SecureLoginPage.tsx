@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { User } from '../types';
-import { validateEmail } from '../utils/security';
 import { login, storeUser } from '../services/authService';
-import { User as UserIcon, Lock, Eye, EyeOff, AlertCircle, Check } from 'lucide-react';
+import { User as UserIcon, Eye, EyeOff, AlertCircle, Check } from 'lucide-react';
 
 interface SecureLoginPageProps {
   onLogin: (user: User) => void;
@@ -10,7 +9,7 @@ interface SecureLoginPageProps {
   selectedRole?: string;
 }
 
-export function SecureLoginPage({ onLogin, onBack, selectedRole }: SecureLoginPageProps) {
+export function SecureLoginPage({ onLogin }: SecureLoginPageProps) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
