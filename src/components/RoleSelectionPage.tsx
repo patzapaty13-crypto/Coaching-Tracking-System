@@ -42,18 +42,21 @@ export function RoleSelectionPage({ onRoleSelect }: RoleSelectionPageProps) {
       title: 'Auto Tracking',
       description: 'บันทึก Coaching Session อัตโนมัติพร้อม Timeline',
       gradient: 'from-blue-500 to-cyan-500',
+      titleColor: 'text-blue-600',
     },
     {
       icon: Bot,
       title: 'AI Assistant',
       description: 'AI Agent ช่วยสรุปและแนะนำ Action Items',
       gradient: 'from-purple-500 to-pink-500',
+      titleColor: 'text-green-600',
     },
     {
       icon: Layout,
       title: 'All-in-One',
       description: 'รวมข้อมูลทุกอย่างไว้ในที่เดียว ไม่ต้องใช้ Line/Excel',
       gradient: 'from-orange-500 to-red-500',
+      titleColor: 'text-purple-600',
     },
   ];
 
@@ -107,7 +110,7 @@ export function RoleSelectionPage({ onRoleSelect }: RoleSelectionPageProps) {
                 <div className={`w-12 h-12 bg-gradient-to-br ${feature.gradient} rounded-xl flex items-center justify-center mb-4 shadow-sm`}>
                   <Icon className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{feature.title}</h3>
+                <h3 className={`text-lg font-semibold ${feature.titleColor} mb-2`}>{feature.title}</h3>
                 <p className="text-sm text-gray-600 leading-relaxed">{feature.description}</p>
               </div>
             );
