@@ -23,8 +23,16 @@ export function CommitteeDashboard({ user, onLogout }: CommitteeDashboardProps) 
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
 
   // Get projects assigned to this committee member
-  // In real app, this would be filtered by assignment
-  const assignedProjects = mockProjects;
+  // Committee can only see projects they are assigned to evaluate
+  // For demo: committee can see projects that have evaluations or are in presentation/completed status
+  const assignedProjects = mockProjects.filter(p => {
+    // If project has evaluation by this committee member, show it
+    if (myEvaluations.some(e => e.projectId === p.id)) {
+      return true;
+    }
+    // Committee can see projects ready for evaluation (presentation/completed)
+    return p.status === 'presentation' || p.status === 'completed';
+  });
   
   // Get evaluations by this committee member
   const myEvaluations = mockEvaluations.filter(e => e.committeeId === user.id);

@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import { User } from '../types';
-import { validatePassword, validateEmail } from '../utils/security';
-import { authApi } from '../services/api';
-import { storeTokens } from '../utils/auth';
-import { logAuditEvent } from '../utils/audit';
+import { validateEmail } from '../utils/security';
+import { login, storeUser } from '../services/authService';
 import { Lock, Mail, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 interface SecureLoginPageProps {
@@ -16,7 +14,6 @@ export function SecureLoginPage({ onLogin }: SecureLoginPageProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState<'weak' | 'medium' | 'strong' | null>(null);
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -37,21 +34,8 @@ export function SecureLoginPage({ onLogin }: SecureLoginPageProps) {
     const value = e.target.value;
     setPassword(value);
     
+    // Clear password error when user types
     if (value) {
-      const validation = validatePassword(value);
-      setPasswordStrength(validation.strength);
-      
-      if (!validation.isValid) {
-        setErrors((prev) => ({ ...prev, password: validation.errors[0] }));
-      } else {
-        setErrors((prev => {
-          const newErrors = { ...prev };
-          delete newErrors.password;
-          return newErrors;
-        }));
-      }
-    } else {
-      setPasswordStrength(null);
       setErrors((prev => {
         const newErrors = { ...prev };
         delete newErrors.password;
@@ -79,53 +63,22 @@ export function SecureLoginPage({ onLogin }: SecureLoginPageProps) {
     }
 
     try {
-      // In production, this would call the real API
-      // const response = await authApi.login(email, password);
-      // if (response.success && response.data) {
-      //   storeTokens(response.data);
-      //   // Get user info from token or separate API call
-      //   const user = await getUserInfo();
-      //   onLogin(user);
-      // }
-
-      // Demo mode - simulate login
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const result = await login(email, password);
       
-      // For demo, create a mock user
-      const mockUser: User = {
-        id: 'demo-user',
-        name: 'Demo User',
-        email: email,
-        role: 'student',
-      };
-
-      logAuditEvent(mockUser.id, mockUser.role, 'login', { success: true });
-      onLogin(mockUser);
+      if (result.success && result.user) {
+        storeUser(result.user);
+        onLogin(result.user);
+      } else {
+        setErrors({ general: result.error || 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ' });
+      }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ';
       setErrors({ general: errorMessage });
-      logAuditEvent('', 'guest', 'login_failed', { 
-        success: false,
-        details: { email, error: errorMessage }
-      });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const getPasswordStrengthColor = () => {
-    if (!passwordStrength) return '';
-    switch (passwordStrength) {
-      case 'weak':
-        return 'bg-red-500';
-      case 'medium':
-        return 'bg-yellow-500';
-      case 'strong':
-        return 'bg-green-500';
-      default:
-        return '';
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
@@ -222,32 +175,22 @@ export function SecureLoginPage({ onLogin }: SecureLoginPageProps) {
                 <p className="mt-1 text-sm text-red-600">{errors.password}</p>
               )}
 
-              {/* Password Requirements */}
-              {password && (
-                <div className="mt-2 text-xs text-gray-500 space-y-1">
-                  <p>ข้อกำหนดรหัสผ่าน:</p>
-                  <ul className="list-disc list-inside space-y-0.5 ml-2">
-                    <li className={password.length >= 10 ? 'text-green-600' : ''}>
-                      อย่างน้อย 10 ตัวอักษร
-                    </li>
-                    <li className={/[0-9]/.test(password) ? 'text-green-600' : ''}>
-                      มีตัวเลข
-                    </li>
-                    <li className={/[a-z]/.test(password) && /[A-Z]/.test(password) ? 'text-green-600' : ''}>
-                      มีตัวพิมพ์ใหญ่และพิมพ์เล็ก
-                    </li>
-                    <li className={/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password) ? 'text-green-600' : ''}>
-                      มีตัวอักษรพิเศษ
-                    </li>
-                  </ul>
-                </div>
-              )}
+              {/* Demo Password Hint */}
+              <div className="mt-2 text-xs text-gray-500">
+                <p className="font-medium mb-1">Demo Accounts:</p>
+                <ul className="list-disc list-inside space-y-0.5 ml-2 text-gray-400">
+                  <li>Student: somchai@student.spu.ac.th / Student123!@#</li>
+                  <li>Advisor: wichai@spu.ac.th / Advisor123!@#</li>
+                  <li>Admin: admin@spu.ac.th / Admin123!@#</li>
+                  <li>Committee: external@company.com / Committee123!@#</li>
+                </ul>
+              </div>
             </div>
 
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={isLoading || !!errors.email || !!errors.password}
+              disabled={isLoading || !!errors.email || !email || !password}
               className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               {isLoading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
