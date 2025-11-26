@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { User } from '../types';
 import { validateEmail } from '../utils/security';
 import { login, storeUser } from '../services/authService';
