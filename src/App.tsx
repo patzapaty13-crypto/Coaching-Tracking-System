@@ -4,18 +4,18 @@ import { StudentDashboard } from './components/StudentDashboard';
 import { AdvisorDashboard } from './components/AdvisorDashboard';
 import { AdminDashboard } from './components/AdminDashboard';
 import { CommitteeDashboard } from './components/CommitteeDashboard';
-import { LandingPage } from './components/LandingPage';
 import { RoleSelectionPage } from './components/RoleSelectionPage';
 import { SecureLoginPage } from './components/SecureLoginPage';
 import { getCurrentUserFromStorage, clearUser } from './services/authService';
 import { clearTokens } from './utils/auth';
 import { logAuditEvent } from './utils/audit';
+import { mockUsers } from './data/mockData';
 
-type AppView = 'landing' | 'role-selection' | 'login' | 'dashboard';
+type AppView = 'role-selection' | 'login' | 'dashboard';
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [currentView, setCurrentView] = useState<AppView>('landing');
+  const [currentView, setCurrentView] = useState<AppView>('role-selection');
   const [selectedRole, setSelectedRole] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
 
@@ -29,18 +29,13 @@ export default function App() {
     setIsLoading(false);
   }, []);
 
-  const handleGetStarted = () => {
-    setCurrentView('role-selection');
-  };
-
   const handleRoleSelect = (role: string) => {
-    setSelectedRole(role);
-    setCurrentView('login');
-  };
-
-  const handleBackToLanding = () => {
-    setCurrentView('landing');
-    setSelectedRole('');
+    // Find first user with this role
+    const user = mockUsers.find((u) => u.role === role);
+    if (user) {
+      setSelectedRole(role);
+      setCurrentView('login');
+    }
   };
 
   const handleBackToRoleSelection = () => {
@@ -60,13 +55,13 @@ export default function App() {
     clearUser();
     clearTokens();
     setCurrentUser(null);
-    setCurrentView('landing');
+    setCurrentView('role-selection');
     setSelectedRole('');
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600 font-medium">กำลังโหลด...</p>
@@ -97,13 +92,11 @@ export default function App() {
 
   // Show appropriate view based on currentView state
   switch (currentView) {
-    case 'landing':
-      return <LandingPage onGetStarted={handleGetStarted} />;
     case 'role-selection':
-      return <RoleSelectionPage onRoleSelect={handleRoleSelect} onBack={handleBackToLanding} />;
+      return <RoleSelectionPage onRoleSelect={handleRoleSelect} />;
     case 'login':
       return <SecureLoginPage onLogin={handleLogin} onBack={handleBackToRoleSelection} selectedRole={selectedRole} />;
     default:
-      return <LandingPage onGetStarted={handleGetStarted} />;
+      return <RoleSelectionPage onRoleSelect={handleRoleSelect} />;
   }
 }
