@@ -3,7 +3,7 @@ import { User } from '../types';
 import { validateEmail } from '../utils/security';
 import { login, storeUser } from '../services/authService';
 import { mockUsers } from '../data/mockData';
-import { Lock, Mail, Eye, EyeOff, AlertCircle, GraduationCap, Users, Shield, Briefcase, Sparkles } from 'lucide-react';
+import { Lock, User as UserIcon, Eye, EyeOff, AlertCircle, GraduationCap, Users, Shield, Briefcase, ChevronRight } from 'lucide-react';
 
 interface SecureLoginPageProps {
   onLogin: (user: User) => void;
@@ -34,24 +34,33 @@ const roleColors = {
   committee: 'bg-orange-500',
 };
 
+// Generate avatar initials
+function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase()
+    .substring(0, 2);
+}
+
 export function SecureLoginPage({ onLogin }: SecureLoginPageProps) {
-  const [email, setEmail] = useState('');
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
+  const [errors, setErrors] = useState<{ username?: string; password?: string; general?: string }>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [showQuickSelect, setShowQuickSelect] = useState(false);
+  const [showAccountSelect, setShowAccountSelect] = useState(true);
 
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setEmail(value);
+    setUsername(value);
     
-    if (value && !validateEmail(value)) {
-      setErrors((prev) => ({ ...prev, email: 'รูปแบบอีเมลไม่ถูกต้อง' }));
-    } else {
+    if (value) {
       setErrors((prev => {
         const newErrors = { ...prev };
-        delete newErrors.email;
+        delete newErrors.username;
         return newErrors;
       }));
     }
@@ -70,10 +79,11 @@ export function SecureLoginPage({ onLogin }: SecureLoginPageProps) {
     }
   };
 
-  const handleQuickSelect = (selectedUser: User) => {
-    setEmail(selectedUser.email);
-    setPassword(DEMO_PASSWORDS[selectedUser.email.toLowerCase()] || '');
-    setShowQuickSelect(false);
+  const handleAccountSelect = (user: User) => {
+    setSelectedUser(user);
+    setUsername(user.email);
+    setPassword(DEMO_PASSWORDS[user.email.toLowerCase()] || '');
+    setShowAccountSelect(false);
     setErrors({});
   };
 
@@ -82,8 +92,14 @@ export function SecureLoginPage({ onLogin }: SecureLoginPageProps) {
     setErrors({});
     setIsLoading(true);
 
-    if (!email || !validateEmail(email)) {
-      setErrors({ email: 'กรุณากรอกอีเมลที่ถูกต้อง' });
+    if (!username) {
+      setErrors({ username: 'กรุณากรอกอีเมล' });
+      setIsLoading(false);
+      return;
+    }
+
+    if (!validateEmail(username)) {
+      setErrors({ username: 'รูปแบบอีเมลไม่ถูกต้อง' });
       setIsLoading(false);
       return;
     }
@@ -95,13 +111,13 @@ export function SecureLoginPage({ onLogin }: SecureLoginPageProps) {
     }
 
     try {
-      const result = await login(email, password);
+      const result = await login(username, password);
       
       if (result.success && result.user) {
         storeUser(result.user);
         onLogin(result.user);
       } else {
-        setErrors({ general: result.error || 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ' });
+        setErrors({ general: result.error || 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' });
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ';
@@ -120,83 +136,72 @@ export function SecureLoginPage({ onLogin }: SecureLoginPageProps) {
     return acc;
   }, {} as Record<string, User[]>);
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
-      </div>
+  const roleLabels: Record<string, string> = {
+    student: 'นักศึกษา',
+    advisor: 'อาจารย์ที่ปรึกษา',
+    admin: 'ผู้บริหาร',
+    committee: 'กรรมการภายนอก',
+  };
 
-      <div className="max-w-md w-full relative z-10">
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/20">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="relative inline-block mb-4">
-              <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg transform hover:scale-105 transition-transform duration-300">
-                <Lock className="w-10 h-10 text-white" />
+  // If showing account selection
+  if (showAccountSelect) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-sky-400 via-blue-500 to-blue-600 flex items-center justify-center p-4 relative overflow-hidden">
+        {/* Blurred Cityscape Background */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwMCIgaGVpZ2h0PSI2MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjAlIiB5Mj0iMTAwJSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzAwN2NjYztzdG9wLW9wYWNpdHk6MSIgLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDQ0ODg7c3RvcC1vcGFjaXR5OjEiIC8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMDAiIGhlaWdodD0iNjAwIiBmaWxsPSJ1cmwoI2dyYWQpIi8+PC9zdmc+')] bg-cover bg-center filter blur-3xl scale-150"></div>
+        </div>
+
+        <div className="max-w-2xl w-full relative z-10">
+          <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <Lock className="w-8 h-8 text-white" />
               </div>
-              <div className="absolute -top-1 -right-1">
-                <Sparkles className="w-6 h-6 text-yellow-400 animate-pulse" />
-              </div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">เข้าสู่ระบบ</h1>
+              <p className="text-gray-600 font-medium">SPU Coaching Platform</p>
+              <p className="text-sm text-gray-500 mt-1">ระบบบริหารจัดการ Project-based Learning</p>
+              <p className="text-sm text-gray-500 mt-2 font-medium">เลือกบัญชีเพื่อทดสอบ</p>
             </div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-              เข้าสู่ระบบ
-            </h1>
-            <p className="text-gray-600 font-medium">SPU Coaching Platform</p>
-            <p className="text-sm text-gray-500 mt-1">ระบบบริหารจัดการ Project-based Learning</p>
-          </div>
 
-          {/* Quick Select Button */}
-          <button
-            type="button"
-            onClick={() => setShowQuickSelect(!showQuickSelect)}
-            className="w-full mb-6 px-4 py-2.5 bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-dashed border-blue-300 rounded-xl text-blue-700 font-medium hover:from-blue-100 hover:to-purple-100 hover:border-blue-400 transition-all duration-200 flex items-center justify-center gap-2"
-          >
-            <Users className="w-5 h-5" />
-            <span>เลือกบัญชีเพื่อทดสอบ</span>
-          </button>
-
-          {/* Quick Select Cards */}
-          {showQuickSelect && (
-            <div className="mb-6 space-y-3 animate-in fade-in slide-in-from-top-2">
+            {/* Account Selection by Role */}
+            <div className="space-y-6 max-h-[60vh] overflow-y-auto">
               {Object.entries(usersByRole).map(([role, users]) => {
                 const Icon = roleIcons[role as keyof typeof roleIcons];
                 const colorClass = roleColors[role as keyof typeof roleColors];
-                const roleLabels: Record<string, string> = {
-                  student: 'นักศึกษา',
-                  advisor: 'อาจารย์ที่ปรึกษา',
-                  admin: 'ผู้บริหาร',
-                  committee: 'กรรมการภายนอก',
-                };
 
                 return (
-                  <div key={role} className="space-y-2">
+                  <div key={role} className="space-y-3">
                     <div className="flex items-center gap-2 px-2">
-                      <div className={`${colorClass} w-6 h-6 rounded-lg flex items-center justify-center`}>
-                        <Icon className="w-4 h-4 text-white" />
+                      <div className={`${colorClass} w-8 h-8 rounded-lg flex items-center justify-center`}>
+                        <Icon className="w-5 h-5 text-white" />
                       </div>
-                      <span className="text-sm font-semibold text-gray-700">{roleLabels[role]}</span>
+                      <span className="text-base font-semibold text-gray-800">{roleLabels[role]}</span>
                     </div>
-                    <div className="grid grid-cols-1 gap-2">
+                    <div className="space-y-2">
                       {users.map((user) => (
                         <button
                           key={user.id}
                           type="button"
-                          onClick={() => handleQuickSelect(user)}
-                          className="text-left px-4 py-3 bg-white border-2 border-gray-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all duration-200 group"
+                          onClick={() => handleAccountSelect(user)}
+                          className="w-full text-left px-4 py-3 bg-white border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 group flex items-center justify-between"
                         >
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <div className={`${colorClass} w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0`}>
+                              <span className="text-white font-semibold text-sm">
+                                {getInitials(user.name)}
+                              </span>
+                            </div>
                             <div className="flex-1 min-w-0">
                               <p className="font-medium text-gray-900 truncate group-hover:text-blue-700">
                                 {user.name}
                               </p>
                               <p className="text-xs text-gray-500 truncate mt-0.5">{user.email}</p>
                             </div>
-                            <div className={`${colorClass} w-8 h-8 rounded-lg flex items-center justify-center ml-2 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity`}>
-                              <Icon className="w-4 h-4 text-white" />
-                            </div>
+                          </div>
+                          <div className={`${colorClass} w-8 h-8 rounded-lg flex items-center justify-center ml-2 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity`}>
+                            <Icon className="w-4 h-4 text-white" />
                           </div>
                         </button>
                       ))}
@@ -205,66 +210,87 @@ export function SecureLoginPage({ onLogin }: SecureLoginPageProps) {
                 );
               })}
             </div>
-          )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Main login form
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-sky-400 via-blue-500 to-blue-600 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Blurred Cityscape Background */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwMCIgaGVpZ2h0PSI2MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjAlIiB5Mj0iMTAwJSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzAwN2NjYztzdG9wLW9wYWNpdHk6MSIgLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDQ0ODg7c3RvcC1vcGFjaXR5OjEiIC8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMDAiIGhlaWdodD0iNjAwIiBmaWxsPSJ1cmwoI2dyYWQpIi8+PC9zdmc+')] bg-cover bg-center filter blur-3xl scale-150"></div>
+      </div>
+
+      <div className="max-w-md w-full relative z-10">
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8">
+          {/* Profile Picture */}
+          <div className="flex flex-col items-center mb-6">
+            <div className={`${selectedUser ? roleColors[selectedUser.role as keyof typeof roleColors] : 'bg-gray-400'} w-24 h-24 rounded-full flex items-center justify-center mb-4 shadow-lg border-4 border-white`}>
+              {selectedUser ? (
+                <span className="text-white font-bold text-2xl">
+                  {getInitials(selectedUser.name)}
+                </span>
+              ) : (
+                <UserIcon className="w-12 h-12 text-white" />
+              )}
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900">
+              {selectedUser ? selectedUser.name : 'Guest User'}
+            </h2>
+          </div>
 
           {/* Error Message */}
           {errors.general && (
-            <div className="mb-4 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg flex items-start gap-3 text-red-700 animate-in fade-in slide-in-from-top-2">
+            <div className="mb-4 p-3 bg-red-50 border-l-4 border-red-500 rounded-lg flex items-start gap-2 text-red-700 text-sm">
               <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-              <span className="text-sm flex-1">{errors.general}</span>
+              <span className="flex-1">{errors.general}</span>
             </div>
           )}
 
           {/* Login Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Email Field */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Username Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
-                อีเมล
-              </label>
-              <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+              <div className="relative">
+                <UserIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={handleEmailChange}
-                  className={`w-full pl-12 pr-4 py-3.5 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${
-                    errors.email 
+                  id="username"
+                  type="text"
+                  value={username}
+                  onChange={handleUsernameChange}
+                  className={`w-full pl-12 pr-4 py-3.5 rounded-xl border-2 transition-all ${
+                    errors.username 
                       ? 'border-red-500 bg-red-50' 
-                      : 'border-gray-300 hover:border-gray-400 bg-white'
+                      : 'border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-white'
                   }`}
-                  placeholder="your.email@spu.ac.th"
-                  autoComplete="email"
+                  placeholder="Username"
+                  autoComplete="username"
                   required
                 />
               </div>
-              {errors.email && (
-                <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
-                  <AlertCircle className="w-4 h-4" />
-                  {errors.email}
-                </p>
+              {errors.username && (
+                <p className="mt-1 text-sm text-red-600">{errors.username}</p>
               )}
             </div>
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
-                รหัสผ่าน
-              </label>
-              <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={handlePasswordChange}
-                  className={`w-full pl-12 pr-12 py-3.5 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${
+                  className={`w-full pl-12 pr-12 py-3.5 rounded-xl border-2 transition-all ${
                     errors.password 
                       ? 'border-red-500 bg-red-50' 
-                      : 'border-gray-300 hover:border-gray-400 bg-white'
+                      : 'border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-white'
                   }`}
-                  placeholder="••••••••••"
+                  placeholder="Password"
                   autoComplete="current-password"
                   required
                 />
@@ -277,18 +303,15 @@ export function SecureLoginPage({ onLogin }: SecureLoginPageProps) {
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
-                  <AlertCircle className="w-4 h-4" />
-                  {errors.password}
-                </p>
+                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
               )}
             </div>
 
-            {/* Submit Button */}
+            {/* Login Button */}
             <button
               type="submit"
-              disabled={isLoading || !!errors.email || !email || !password}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3.5 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 active:scale-[0.98] transition-all duration-200 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed disabled:hover:from-gray-400 disabled:hover:to-gray-400 shadow-lg hover:shadow-xl disabled:shadow-none"
+              disabled={isLoading || !username || !password}
+              className="w-full bg-gray-900 text-white py-3.5 rounded-xl font-semibold hover:bg-gray-800 active:scale-[0.98] transition-all duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed shadow-lg hover:shadow-xl disabled:shadow-none"
             >
               {isLoading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -296,49 +319,51 @@ export function SecureLoginPage({ onLogin }: SecureLoginPageProps) {
                   กำลังเข้าสู่ระบบ...
                 </span>
               ) : (
-                'เข้าสู่ระบบ'
+                'Login'
               )}
             </button>
           </form>
 
+          {/* Forgot Password Link */}
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              className="text-sm text-white hover:text-gray-200 transition-colors"
+            >
+              Forgot Username / Password?
+            </button>
+          </div>
+
+          {/* Change Account Button */}
+          <div className="mt-6 text-center">
+            <button
+              type="button"
+              onClick={() => {
+                setShowAccountSelect(true);
+                setSelectedUser(null);
+                setUsername('');
+                setPassword('');
+                setErrors({});
+              }}
+              className="text-sm text-white hover:text-gray-200 transition-colors flex items-center justify-center gap-1 mx-auto"
+            >
+              เลือกบัญชีอื่น
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+
           {/* Security Notice */}
-          <div className="mt-8 pt-6 border-t border-gray-200">
-            <div className="flex items-center justify-center gap-2 text-xs text-gray-600">
-              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                <Lock className="w-4 h-4 text-green-600" />
-              </div>
-              <div className="text-left">
-                <p className="font-medium text-gray-700">การเชื่อมต่อถูกเข้ารหัสด้วย HTTPS</p>
-                <p className="text-gray-500">ข้อมูลของคุณจะถูกเก็บรักษาอย่างปลอดภัย</p>
+          <div className="mt-8 pt-6 border-t border-white/20">
+            <div className="flex items-center justify-center gap-2 text-xs text-white/90">
+              <Lock className="w-4 h-4" />
+              <div className="text-center">
+                <p className="font-medium">การเชื่อมต่อถูกเข้ารหัสด้วย HTTPS</p>
+                <p className="text-white/70 mt-0.5">ข้อมูลของคุณจะถูกเก็บรักษาอย่างปลอดภัย</p>
               </div>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Add custom animations */}
-      <style>{`
-        @keyframes blob {
-          0%, 100% {
-            transform: translate(0, 0) scale(1);
-          }
-          33% {
-            transform: translate(30px, -50px) scale(1.1);
-          }
-          66% {
-            transform: translate(-20px, 20px) scale(0.9);
-          }
-        }
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-      `}</style>
     </div>
   );
 }
